@@ -1,41 +1,65 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  runApp(MyApp());
+}
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-  // This widget is the root of your application.
+class MyApp extends StatefulWidget {
+  const MyApp({Key? key}) : super(key: key);
+  @override
+  State<MyApp> createState() => _MyappState();
+}
+
+//today  Topic: Flutter Image
+class _MyappState extends State<MyApp> {
+  File file = File('Users/luisintegan/Dowloads/image/icon.png');
+  Uint8List? imageByteData;
+
+  void _getImage() async {
+    Uint8List data = (await rootBundle.load('avatar.png')).buffer.asUint16List()
+        as Uint8List;
+    setState(() {
+      print(data);
+      imageByteData = data;
+      @override
+      void initState() {
+        super.initState();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      // Application name
-      title: 'Flutter Hello World',
-      // Application theme data, you can set the colors for the application as
-      // you want
-      theme: ThemeData(
-        // useMaterial3: false,
-        primarySwatch: Colors.blue,
-      ),
-      // A widget which will be started on application startup
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
-
-class MyHomePage extends StatelessWidget {
-  final String title;
-  const MyHomePage({super.key, required this.title});  
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        // The title text which will be shown on the action bar
-        title: Text(title),
-      ),
-      body: Center(
-        child: Text(
-          'Hello, World!',
+      debugShowCheckedModeBanner: false,
+      title: "Fluter imagen",
+      theme: ThemeData(primarySwatch: Colors.red),
+      home: Scaffold(
+        appBar: AppBar(title: Text("Flutter Image")),
+        body: Container(
+          child: Image.memory(imageByteData!, //imagen
+              width: 300,
+              height: 300,
+              fit: BoxFit.contain,
+              repeat: ImageRepeat.repeat,
+              frameBuilder: (context, child, frame, loaded) {
+            if (loaded) {
+              return child;
+            }
+            return AnimatedOpacity(
+              child: child,
+              opacity: frame == null ? 0 : 1,
+              duration: Duration(seconds: 1),
+              curve: Curves.easeOut,
+            );
+          }, errorBuilder: (context, exception, stackTrace) {
+            return Center(
+              child: Text("Somethimg Wrong"),
+            );
+          }),
         ),
       ),
     );
